@@ -12,23 +12,6 @@
 //! * Your own [currencyapi api key][currencyapi_api]
 //! * Async runtime configured e.g. [tokio][tokio]
 //!
-//! ## Getting started
-//! Install the latest version of this crate by adding the following line to your `Cargo.toml`
-//! ```toml
-//! [dependencies]
-//! currencyapi = { git = "https://github.com/everapihq/currencyapi-rs" }
-//! ```
-//! Import the crate and create a new instance of the [Currencyapi][currencyapi] struct.
-//! ```
-//! use currencyapi::Currencyapi;
-//! use currencyapi::models;
-//!
-//! async fn run() -> Result<models::station::DetailsResponse, currencyapi::Error> {
-//!   let tanker = Currencyapi::new("your-api-key")?;
-//!   let details = tanker.station.fetch_details("id-of-the-fuel-station").await?;
-//!   Ok(details)
-//! }
-//! ```
 //!
 //!
 //! ## Examples
