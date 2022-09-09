@@ -1,9 +1,9 @@
 //! Module that contains the main [Currencyapi] struct
 
+use std::sync::Arc;
+use reqwest::Client;
 use crate::error::CurrencyapiError;
 use crate::{error, models, utils};
-use price::PriceApi;
-use station::StationApi;
 use crate::utils::baseline::construct_base_url;
 
 /// Settings struct that contains the api key
@@ -16,7 +16,8 @@ pub struct Settings {
 /// Create a new instance of the struct with your api key as parameter.
 #[derive(Debug, Clone)]
 pub struct Currencyapi {
-
+    client: Client,
+    settings: Arc<Settings>,
 }
 
 impl<'a> Currencyapi {
@@ -27,13 +28,13 @@ impl<'a> Currencyapi {
             api_key: String::from(api_key),
         });
         let client = utils::baseline::construct_client(None, &settings)?;
-        Ok(Self {})
+        Ok(Self { client, settings })
     }
 
     pub async fn status(
         &self,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.options.api_key, Some("status"))?;
+        let mut url = construct_base_url(&self.settings.api_key, Some("status"))?;
         let res_body = self
             .client
             .get(url)
@@ -50,7 +51,7 @@ impl<'a> Currencyapi {
     pub async fn currencies(
         &self,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.options.api_key, Some("currencies"))?;
+        let mut url = construct_base_url(&self.settings.api_key, Some("currencies"))?;
         let res_body = self
             .client
             .get(url)
@@ -69,7 +70,7 @@ impl<'a> Currencyapi {
         base_currency: &'a str,
         currencies: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.options.api_key, Some("latest"))?;
+        let mut url = construct_base_url(&self.settings.api_key, Some("latest"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("currencies", currencies);
@@ -92,7 +93,7 @@ impl<'a> Currencyapi {
         date: &'a str,
         currencies: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.options.api_key, Some("historical"))?;
+        let mut url = construct_base_url(&self.settings.api_key, Some("historical"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("date", date)
@@ -117,7 +118,7 @@ impl<'a> Currencyapi {
         value: i8,
         currencies: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.options.api_key, Some("convert"))?;
+        let mut url = construct_base_url(&self.settings.api_key, Some("convert"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("date", date)
@@ -144,7 +145,7 @@ impl<'a> Currencyapi {
         currencies: &'a str,
         accuracy: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.options.api_key, Some("range"))?;
+        let mut url = construct_base_url(&self.settings.api_key, Some("range"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("datetime_start", datetime_start)
