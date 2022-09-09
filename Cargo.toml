@@ -1,5 +1,5 @@
 [package]
-name = "currencyapi-rust"
+name = "currencyapi-rs"
 homepage = "https://github.com/everapihq/currencyapi-rs"
 repository = "https://github.com/everapihq/currencyapi-rs"
 documentation = "https://currencyapi.com/docs"
