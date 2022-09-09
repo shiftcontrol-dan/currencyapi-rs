@@ -1,0 +1,105 @@
+pub mod baseline {
+    use crate::api;
+    use crate::error::CurrencyapiError;
+    use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
+    use reqwest::{Client, Url};
+
+    const BASE_URL: &str = "https://api.currencyapi.com/v3/";
+
+    pub fn construct_client(
+        user_agent: Option<&str>,
+        settings: &api::Settings,
+    ) -> Result<Client, CurrencyapiError> {
+        let mut headers = HeaderMap::new();
+        let content_type = HeaderValue::from_str("application/json")?;
+        headers.insert(CONTENT_TYPE, content_type);
+        let agent = user_agent.map_or_else(
+            || format!("{}/{}", settings.package_name, settings.package_version),
+            String::from,
+        );
+        let client = Client::builder()
+            .user_agent(agent)
+            .default_headers(headers)
+            .build()
+            .map_err(|err| CurrencyapiError::ClientConstruction { source: err })?;
+        Ok(client)
+    }
+
+    pub fn construct_base_url(
+        api_key: &str,
+        with_path: Option<&str>,
+    ) -> Result<Url, CurrencyapiError> {
+        let mut url = Url::parse(BASE_URL).map_err(|_| CurrencyapiError::UrlConstruction)?;
+        url.query_pairs_mut().append_pair("apikey", api_key);
+        if let Some(path) = with_path {
+            url.set_path(path);
+        }
+        Ok(url)
+    }
+}
+
+pub mod price {
+    use std::fmt::Display;
+
+    pub fn format_ids_string(ids: impl IntoIterator<Item = impl AsRef<str> + Display>) -> String {
+        let mut ids_string = String::from("");
+        for (index, id) in ids.into_iter().enumerate() {
+            ids_string = if index == 0 {
+                id.to_string()
+            } else {
+                format!("{},{}", ids_string, id)
+            };
+        }
+        ids_string
+    }
+
+    pub fn count_ids<I>(ids: I) -> (usize, Vec<I::Item>)
+        where
+            I: IntoIterator,
+            I::Item: AsRef<str> + Display,
+    {
+        let mut counted_ids = Vec::new();
+        let mut counter = 0_usize;
+        for item in ids.into_iter() {
+            counted_ids.push(item);
+            counter += 1;
+        }
+        (counter, counted_ids)
+    }
+}
+
+pub mod station {}
+
+#[cfg(test)]
+mod baseline_test {
+    use super::baseline::*;
+
+    #[test]
+    fn should_create_base_url_with_api_key() {
+        let base_url = construct_base_url("123", None).unwrap();
+        assert_eq!(base_url.query(), Some("apikey=123"));
+    }
+}
+
+#[cfg(test)]
+mod price_test {
+    use super::price::*;
+
+    #[test]
+    fn should_create_string_of_ids() {
+        let ids = vec!["123", "456"];
+        let ids_string = format_ids_string(ids);
+        assert_eq!(ids_string, "123,456");
+    }
+
+    #[test]
+    fn should_count_and_return_ids() {
+        let dummy_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
+        let (count, counted_ids) = count_ids(dummy_ids);
+        assert_eq!(count, 11);
+        assert_eq!(counted_ids.len(), 11);
+        for (index, entry) in counted_ids.into_iter().enumerate() {
+            assert_eq!(entry, dummy_ids[index]);
+        }
+    }
+}
