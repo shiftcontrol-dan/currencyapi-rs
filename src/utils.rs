@@ -14,7 +14,7 @@ pub mod baseline {
         let content_type = HeaderValue::from_str("application/json")?;
         headers.insert(CONTENT_TYPE, content_type);
         let agent = user_agent.map_or_else(
-            || format!("{}/{}", settings.package_name, settings.package_version),
+            || format!("{}/{}", "", ""),
             String::from,
         );
         let client = Client::builder()
@@ -38,38 +38,6 @@ pub mod baseline {
     }
 }
 
-pub mod price {
-    use std::fmt::Display;
-
-    pub fn format_ids_string(ids: impl IntoIterator<Item = impl AsRef<str> + Display>) -> String {
-        let mut ids_string = String::from("");
-        for (index, id) in ids.into_iter().enumerate() {
-            ids_string = if index == 0 {
-                id.to_string()
-            } else {
-                format!("{},{}", ids_string, id)
-            };
-        }
-        ids_string
-    }
-
-    pub fn count_ids<I>(ids: I) -> (usize, Vec<I::Item>)
-        where
-            I: IntoIterator,
-            I::Item: AsRef<str> + Display,
-    {
-        let mut counted_ids = Vec::new();
-        let mut counter = 0_usize;
-        for item in ids.into_iter() {
-            counted_ids.push(item);
-            counter += 1;
-        }
-        (counter, counted_ids)
-    }
-}
-
-pub mod station {}
-
 #[cfg(test)]
 mod baseline_test {
     use super::baseline::*;
@@ -78,28 +46,5 @@ mod baseline_test {
     fn should_create_base_url_with_api_key() {
         let base_url = construct_base_url("123", None).unwrap();
         assert_eq!(base_url.query(), Some("apikey=123"));
-    }
-}
-
-#[cfg(test)]
-mod price_test {
-    use super::price::*;
-
-    #[test]
-    fn should_create_string_of_ids() {
-        let ids = vec!["123", "456"];
-        let ids_string = format_ids_string(ids);
-        assert_eq!(ids_string, "123,456");
-    }
-
-    #[test]
-    fn should_count_and_return_ids() {
-        let dummy_ids = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
-        let (count, counted_ids) = count_ids(dummy_ids);
-        assert_eq!(count, 11);
-        assert_eq!(counted_ids.len(), 11);
-        for (index, entry) in counted_ids.into_iter().enumerate() {
-            assert_eq!(entry, dummy_ids[index]);
-        }
     }
 }
