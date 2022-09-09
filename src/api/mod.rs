@@ -122,7 +122,7 @@ impl<'a> Currencyapi {
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("date", date)
-            .append_pair("value", value.to_string())
+            .append_pair("value", &value.to_string())
             .append_pair("currencies", currencies);
         let res_body = self
             .client
