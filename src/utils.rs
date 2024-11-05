@@ -52,7 +52,6 @@ mod baseline_test {
     fn should_create_base_url_with_api_key_and_path() {
         let base_url = construct_base_url(Some("/test/path")).unwrap();
         assert_eq!(base_url.path(), "/v3/test/path");
-        println!("{:?}", base_url);
     }
 
 }
