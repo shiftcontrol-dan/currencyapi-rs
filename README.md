@@ -13,7 +13,7 @@ This crate is under development. Especially the response parsing needs some more
 
 ```toml
 [dependencies]
-currencyapi = "0.1.0"
+currencyapi = "0.1.1"
 ```
 
 ## Requirements
