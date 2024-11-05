@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+use serde_json::Value;
+
 /// Response of the currencyapi
-#[derive(Debug, Deserialize, Serialize, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct DetailsResponse {
     /// Data source
-    pub data: String,
+    pub data: HashMap<String, Value>,
     /// Request status
-    pub meta: String,
+    pub meta: Option<HashMap<String, Value>>,
 }

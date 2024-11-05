@@ -44,18 +44,17 @@ impl<'a> Currencyapi {
         &self,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
         let url = construct_base_url(Some("status"))?;
-        let res_body = self
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
             .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
     /// Fetches the list of available currencies.
@@ -78,11 +77,10 @@ impl<'a> Currencyapi {
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
     /// Fetches the latest currency data for the specified base currency and target currencies.
@@ -108,18 +106,17 @@ impl<'a> Currencyapi {
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("currencies", currencies);
-        let res_body = self
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
             .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
     /// Fetches historical currency data for the specified parameters.
@@ -155,11 +152,10 @@ impl<'a> Currencyapi {
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
     /// Converts a value from the base currency to the target currencies for the specified date.
@@ -191,18 +187,17 @@ impl<'a> Currencyapi {
             .append_pair("date", date)
             .append_pair("value", &value.to_string())
             .append_pair("currencies", currencies);
-        let res_body = self
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
             .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
     /// Fetches the range of currency data for the specified parameters.
@@ -237,17 +232,16 @@ impl<'a> Currencyapi {
             .append_pair("datetime_end", datetime_end)
             .append_pair("accuracy", accuracy)
             .append_pair("currencies", currencies);
-        let res_body = self
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
             .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 }
