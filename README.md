@@ -48,7 +48,7 @@ Find out more about our endpoints, parameters and response data structure in the
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
 
 [docs]: https://currencyapi.com/docs
 [currencyapi.com]: https://currencyapi.com
