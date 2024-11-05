@@ -8,7 +8,7 @@ pub mod baseline {
 
     pub fn construct_client(
         user_agent: Option<&str>,
-        settings: &api::Settings,
+        _: &api::Settings,
     ) -> Result<Client, CurrencyapiError> {
         let mut headers = HeaderMap::new();
         let content_type = HeaderValue::from_str("application/json")?;
