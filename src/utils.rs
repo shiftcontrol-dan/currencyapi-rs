@@ -8,7 +8,7 @@ pub mod baseline {
 
     pub fn construct_client(
         user_agent: Option<&str>,
-        settings: &api::Settings,
+        _: &api::Settings,
     ) -> Result<Client, CurrencyapiError> {
         let mut headers = HeaderMap::new();
         let content_type = HeaderValue::from_str("application/json")?;
@@ -26,13 +26,13 @@ pub mod baseline {
     }
 
     pub fn construct_base_url(
-        api_key: &str,
         with_path: Option<&str>,
     ) -> Result<Url, CurrencyapiError> {
         let mut url = Url::parse(BASE_URL).map_err(|_| CurrencyapiError::UrlConstruction)?;
-        url.query_pairs_mut().append_pair("apikey", api_key);
         if let Some(path) = with_path {
-            url.set_path(path);
+            let trimmed_path = path.trim_start_matches('/');
+            let new_path = format!("{}/{}", url.path().trim_end_matches('/'), trimmed_path);
+            url.set_path(&new_path);
         }
         Ok(url)
     }
@@ -44,7 +44,14 @@ mod baseline_test {
 
     #[test]
     fn should_create_base_url_with_api_key() {
-        let base_url = construct_base_url("123", None).unwrap();
-        assert_eq!(base_url.query(), Some("apikey=123"));
+        let base_url = construct_base_url(None).unwrap();
+        assert_eq!(base_url.path(), "/v3/");
     }
+
+    #[test]
+    fn should_create_base_url_with_api_key_and_path() {
+        let base_url = construct_base_url(Some("/test/path")).unwrap();
+        assert_eq!(base_url.path(), "/v3/test/path");
+    }
+
 }

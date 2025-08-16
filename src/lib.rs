@@ -50,6 +50,8 @@ extern crate thiserror;
 
 pub mod api;
 mod error;
+/// This module contains the data structures used for deserializing
+/// the responses from the currencyapi API.pub mod models;
 pub mod models;
 mod utils;
 

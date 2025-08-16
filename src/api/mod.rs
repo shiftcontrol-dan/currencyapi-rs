@@ -31,69 +31,116 @@ impl<'a> Currencyapi {
         Ok(Self { client, settings })
     }
 
+    /// Fetches the status of the currency API.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<models::DetailsResponse, error::CurrencyapiError>` - A result containing either the details response or a currency API error.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the request fails or if the response cannot be parsed.
     pub async fn status(
         &self,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.settings.api_key, Some("status"))?;
-        let res_body = self
+        let url = construct_base_url(Some("status"))?;
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
+            .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
+    /// Fetches the list of available currencies.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<models::DetailsResponse, error::CurrencyapiError>` - A result containing either the details response or a currency API error.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the request fails or if the response cannot be parsed.
     pub async fn currencies(
         &self,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.settings.api_key, Some("currencies"))?;
+        let url = construct_base_url(Some("currencies"))?;
         let res_body = self
             .client
             .get(url)
+            .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
+    /// Fetches the latest currency data for the specified base currency and target currencies.
+    ///
+    /// # Arguments
+    ///
+    /// * `base_currency` - A string slice that holds the base currency code.
+    /// * `currencies` - A string slice that holds the target currencies.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<models::DetailsResponse, error::CurrencyapiError>` - A result containing either the details response or a currency API error.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the request fails or if the response cannot be parsed.
     pub async fn latest(
         &self,
         base_currency: &'a str,
         currencies: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.settings.api_key, Some("latest"))?;
+        let mut url = construct_base_url(Some("latest"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("currencies", currencies);
-        let res_body = self
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
+            .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
+    /// Fetches historical currency data for the specified parameters.
+    ///
+    /// # Arguments
+    ///
+    /// * `base_currency` - A string slice that holds the base currency code.
+    /// * `date` - A string slice that holds the date for the historical data.
+    /// * `currencies` - A string slice that holds the target currencies.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<models::DetailsResponse, error::CurrencyapiError>` - A result containing either the details response or a currency API error.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the request fails or if the response cannot be parsed.
     pub async fn historical(
         &self,
         base_currency: &'a str,
         date: &'a str,
         currencies: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.settings.api_key, Some("historical"))?;
+        let mut url = construct_base_url(Some("historical"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("date", date)
@@ -101,16 +148,32 @@ impl<'a> Currencyapi {
         let res_body = self
             .client
             .get(url)
+            .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
+    /// Converts a value from the base currency to the target currencies for the specified date.
+    ///
+    /// # Arguments
+    ///
+    /// * `base_currency` - A string slice that holds the base currency code.
+    /// * `date` - A string slice that holds the date for the conversion.
+    /// * `value` - An integer that holds the value to be converted.
+    /// * `currencies` - A string slice that holds the target currencies.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<models::DetailsResponse, error::CurrencyapiError>` - A result containing either the details response or a currency API error.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the request fails or if the response cannot be parsed.
     pub async fn convert(
         &self,
         base_currency: &'a str,
@@ -118,25 +181,42 @@ impl<'a> Currencyapi {
         value: i8,
         currencies: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.settings.api_key, Some("convert"))?;
+        let mut url = construct_base_url(Some("convert"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("date", date)
             .append_pair("value", &value.to_string())
             .append_pair("currencies", currencies);
-        let res_body = self
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
+            .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 
+    /// Fetches the range of currency data for the specified parameters.
+    ///
+    /// # Arguments
+    ///
+    /// * `base_currency` - A string slice that holds the base currency code.
+    /// * `datetime_start` - A string slice that holds the start datetime for the range.
+    /// * `datetime_end` - A string slice that holds the end datetime for the range.
+    /// * `currencies` - A string slice that holds the target currencies.
+    /// * `accuracy` - A string slice that holds the accuracy level.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<models::DetailsResponse, error::CurrencyapiError>` - A result containing either the details response or a currency API error.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the request fails or if the response cannot be parsed.
     pub async fn range(
         &self,
         base_currency: &'a str,
@@ -145,23 +225,23 @@ impl<'a> Currencyapi {
         currencies: &'a str,
         accuracy: &'a str,
     ) -> Result<models::DetailsResponse, error::CurrencyapiError> {
-        let mut url = construct_base_url(&self.settings.api_key, Some("range"))?;
+        let mut url = construct_base_url(Some("range"))?;
         url.query_pairs_mut()
             .append_pair("base_currency", base_currency)
             .append_pair("datetime_start", datetime_start)
             .append_pair("datetime_end", datetime_end)
             .append_pair("accuracy", accuracy)
             .append_pair("currencies", currencies);
-        let res_body = self
+        let res_body: models::DetailsResponse = self
             .client
             .get(url)
+            .header("apikey", &self.settings.api_key)
             .send()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?
-            .text()
+            .json()
             .await
             .map_err(|err| error::CurrencyapiError::RequestError { source: err })?;
-        serde_json::from_str::<models::DetailsResponse>(&res_body)
-            .map_err(|_| error::CurrencyapiError::ResponseParsingError { body: res_body })
+        Ok(res_body)
     }
 }
